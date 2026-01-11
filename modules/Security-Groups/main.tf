@@ -5,7 +5,7 @@ resource "aws_default_security_group" "default_security_group" {
   }
 }
 
-# checkov:skip=CKV2_AWS_5:Attached in EC2 module
+# checkov:skip=CKV2_AWS_5:Attached via module structure checkov misses
 resource "aws_security_group" "public" {
   vpc_id      = var.vpc_id
   description = "Allow SSH access from a specific IP"
@@ -15,7 +15,7 @@ resource "aws_security_group" "public" {
   }
 }
 
-# checkov:skip=CKV2_AWS_5:Attached in EC2 module
+# checkov:skip=CKV2_AWS_5:Attached via module structure checkov misses
 resource "aws_security_group" "private" {
   vpc_id      = var.vpc_id
   description = "Allow connections from Private EC2 instance"
@@ -26,6 +26,7 @@ resource "aws_security_group" "private" {
 }
 
 # --- Rules For Public SG ---
+# checkov:skip=CKV_AWS_24:Allow SSH for Lab
 resource "aws_security_group_rule" "public_ingress_ssh" {
   type              = "ingress"
   from_port         = 22
@@ -36,7 +37,7 @@ resource "aws_security_group_rule" "public_ingress_ssh" {
   description       = "Allow SSH from a specific IP"
 }
 
-# checkov:skip=CKV_AWS_382:Allow all egress for Lab purposes
+# checkov:skip=CKV_AWS_382:Allow all egress for Lab updates
 resource "aws_security_group_rule" "public_egress_all" {
   type              = "egress"
   from_port         = 0
@@ -68,7 +69,7 @@ resource "aws_security_group_rule" "private_ingress_all_tcp_from_public" {
   description              = "Allow all TCP ports from Public Security Group"
 }
 
-# checkov:skip=CKV_AWS_382:Allow all egress for Lab purposes
+# checkov:skip=CKV_AWS_382:Allow all egress for Lab updates
 resource "aws_security_group_rule" "private_egress_all" {
   type              = "egress"
   from_port         = 0

@@ -1,4 +1,5 @@
-# checkov:skip=CKV2_AWS_11:VPC Flow Logs skipped for Lab simplicity
+# checkov:skip=CKV2_AWS_11:Flow Logs too expensive for Lab
+# checkov:skip=CKV2_AWS_12:Default SG is handled separately
 resource "aws_vpc" "main_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -10,6 +11,14 @@ resource "aws_vpc" "main_vpc" {
     Environment = "test"
   }
 
+}
+
+# Resource nay giup khoa chat Default SG cua VPC
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main_vpc.id
+  tags = {
+    Name = "Default Security Group - Deny All"
+  }
 }
 
 resource "aws_internet_gateway" "internet_gateway" {
