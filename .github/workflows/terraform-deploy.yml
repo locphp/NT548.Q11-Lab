@@ -1,0 +1,72 @@
+name: 'Terraform Infrastructure Deployment'
+
+on:
+  push:
+    branches:
+      - lab_2 # Workflow sẽ chạy khi có code được push hoặc merge vào nhánh lab_2
+  pull_request:
+    branches:
+      - lab_2 # Chạy test khi tạo Pull Request vào nhánh lab_2
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform Checkov & Deploy'
+    runs-on: ubuntu-latest
+
+    # Thiết lập biến môi trường cho Terraform
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'us-east-1'
+
+    steps:
+      # Lấy source code về
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Cài đặt Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 'latest'
+
+      # Khởi tạo Terraform (Init)
+      - name: Terraform Init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+        run: terraform init
+
+      #  Kiểm tra định dạng Code (Format)
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # Quét bảo mật với Checkov
+      # soft_fail: true giúp pipeline không bị dừng lại nếu phát hiện lỗi bảo mật
+      # Nếu muốn chặn deploy khi có lỗi bảo mật, đổi thành false.
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
+          soft_fail: true
+          quiet: true
+
+      # Terraform Validate (Kiểm tra cú pháp)
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Terraform Plan (Xem trước thay đổi)
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+
+      # Terraform Apply (Chỉ chạy khi push vào nhánh lab_2, không chạy ở Pull Request)o
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/lab_2' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
