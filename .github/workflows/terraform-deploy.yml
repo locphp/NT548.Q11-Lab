@@ -1,72 +1,59 @@
-name: 'Terraform Infrastructure Deployment'
+name: "Terraform Infrastructure Deployment"
 
 on:
   push:
     branches:
-      - lab2 # Workflow sẽ chạy khi có code được push hoặc merge vào nhánh lab_2
+      - main
   pull_request:
-    branches:
-      - lab2 # Chạy test khi tạo Pull Request vào nhánh lab_2
 
 permissions:
   contents: read
 
 jobs:
   terraform:
-    name: 'Terraform Checkov & Deploy'
+    name: "Terraform"
     runs-on: ubuntu-latest
-
+    
     # Thiết lập biến môi trường cho Terraform
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: 'us-east-1'
+      AWS_REGION: "us-east-1"
 
     steps:
-      # Lấy source code về
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      # 1. Checkout code từ repository
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      # Cài đặt Terraform CLI
+      # 2. Cài đặt Terraform CLI
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 'latest'
+          terraform_version: 1.5.0
 
-      # Khởi tạo Terraform (Init)
+      # 3. Khởi tạo Terraform (Init)
       - name: Terraform Init
-        # env:
-        #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #   AWS_REGION: 'us-east-1'
         run: terraform init
 
-      #  Kiểm tra định dạng Code (Format)
+      # 4. Kiểm tra định dạng code (Format)
       - name: Terraform Format
         run: terraform fmt -check
 
-      # Quét bảo mật với Checkov
-      # soft_fail: true giúp pipeline không bị dừng lại nếu phát hiện lỗi bảo mật
-      # Nếu muốn chặn deploy khi có lỗi bảo mật, đổi thành false.
+      # 5. Chạy Checkov để kiểm tra bảo mật (Yêu cầu đề bài)
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
           directory: .
           framework: terraform
-          soft_fail: true
-          quiet: true
+          # soft_fail: true nghĩa là nếu có lỗi bảo mật, pipeline vẫn chạy tiếp (để test). 
+          # Nếu muốn chặt chẽ, hãy set là false hoặc xóa dòng này.
+          soft_fail: true 
 
-      # Terraform Validate (Kiểm tra cú pháp)
-      - name: Terraform Validate
-        run: terraform validate
-
-      # Terraform Plan (Xem trước thay đổi)
+      # 6. Terraform Plan (Xem trước thay đổi)
       - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false
-        continue-on-error: true
+        run: terraform plan -input=false
 
-      # Terraform Apply (Chỉ chạy khi push vào nhánh lab_2, không chạy ở Pull Request)o
+      # 7. Terraform Apply (Chỉ chạy khi push vào nhánh main)
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/lab_2' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
