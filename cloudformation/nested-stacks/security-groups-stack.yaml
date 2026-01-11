@@ -39,7 +39,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       GroupId: !Ref PublicSecurityGroup
-      IpProtocol: -1
+      IpProtocol: '-1'
       FromPort: 0
       ToPort: 0
       CidrIp: 0.0.0.0/0
@@ -83,7 +83,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       GroupId: !Ref PrivateSecurityGroup
-      IpProtocol: -1
+      IpProtocol: '-1'
       FromPort: 0
       ToPort: 0
       CidrIp: 0.0.0.0/0
