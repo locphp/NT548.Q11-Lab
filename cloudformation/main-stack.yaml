@@ -42,9 +42,12 @@ Parameters:
     Default: 'mykey'
     Description: Name of EC2 Key Pair
   
+  # Giữ lại tham số này để không bị lỗi 'Parameter not found' khi Deploy
+  # Nhưng chúng ta sẽ không dùng nó trong TemplateURL nữa
   NestedStacksS3Bucket:
     Type: String
     Description: S3 bucket name where nested stack templates are stored
+    Default: 'placeholder'
   
   NestedStacksS3KeyPrefix:
     Type: String
@@ -56,7 +59,8 @@ Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}vpc-stack.yaml'
+      # [ĐÃ SỬA] Dùng đường dẫn tương đối để CodeBuild tự động upload
+      TemplateURL: nested-stacks/vpc-stack.yaml
       Parameters:
         VpcCIDR: !Ref VpcCIDR
         PublicSubnetCIDR: !Ref PublicSubnetCIDR
@@ -69,9 +73,9 @@ Resources:
   # NAT Gateway Stack
   NATStack:
     Type: AWS::CloudFormation::Stack
-    # Đã xóa DependsOn dư thừa
     Properties:
-      TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}nat-stack.yaml'
+      # [ĐÃ SỬA] Dùng đường dẫn tương đối
+      TemplateURL: nested-stacks/nat-stack.yaml
       Parameters:
         PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
       Tags:
@@ -81,9 +85,9 @@ Resources:
   # Security Groups Stack
   SecurityGroupsStack:
     Type: AWS::CloudFormation::Stack
-    # Đã xóa DependsOn dư thừa
     Properties:
-      TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}security-groups-stack.yaml'
+      # [ĐÃ SỬA] Dùng đường dẫn tương đối
+      TemplateURL: nested-stacks/security-groups-stack.yaml
       Parameters:
         VPCId: !GetAtt VPCStack.Outputs.VPCId
         AllowedIP: !Ref AllowedIP
@@ -94,9 +98,9 @@ Resources:
   # Route Tables Stack
   RouteTablesStack:
     Type: AWS::CloudFormation::Stack
-    # Đã xóa DependsOn dư thừa
     Properties:
-      TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}route-tables-stack.yaml'
+      # [ĐÃ SỬA] Dùng đường dẫn tương đối
+      TemplateURL: nested-stacks/route-tables-stack.yaml
       Parameters:
         VPCId: !GetAtt VPCStack.Outputs.VPCId
         InternetGatewayId: !GetAtt VPCStack.Outputs.InternetGatewayId
@@ -110,9 +114,9 @@ Resources:
   # EC2 Stack
   EC2Stack:
     Type: AWS::CloudFormation::Stack
-    # Đã xóa DependsOn dư thừa
     Properties:
-      TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}ec2-stack.yaml'
+      # [ĐÃ SỬA] Dùng đường dẫn tương đối
+      TemplateURL: nested-stacks/ec2-stack.yaml
       Parameters:
         AMIId: !Ref AMIId
         InstanceType: !Ref InstanceType
