@@ -69,7 +69,7 @@ Resources:
   # NAT Gateway Stack
   NATStack:
     Type: AWS::CloudFormation::Stack
-    # DependsOn: VPCStack  <-- Đã xóa vì dư thừa (đã có !GetAtt bên dưới)
+    # Đã xóa DependsOn dư thừa
     Properties:
       TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}nat-stack.yaml'
       Parameters:
@@ -81,7 +81,7 @@ Resources:
   # Security Groups Stack
   SecurityGroupsStack:
     Type: AWS::CloudFormation::Stack
-    # DependsOn: VPCStack  <-- Đã xóa vì dư thừa
+    # Đã xóa DependsOn dư thừa
     Properties:
       TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}security-groups-stack.yaml'
       Parameters:
@@ -94,9 +94,7 @@ Resources:
   # Route Tables Stack
   RouteTablesStack:
     Type: AWS::CloudFormation::Stack
-    # DependsOn:  <-- Đã xóa block DependsOn này
-    #   - VPCStack
-    #   - NATStack
+    # Đã xóa DependsOn dư thừa
     Properties:
       TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}route-tables-stack.yaml'
       Parameters:
@@ -112,10 +110,7 @@ Resources:
   # EC2 Stack
   EC2Stack:
     Type: AWS::CloudFormation::Stack
-    # DependsOn:  <-- Đã xóa block DependsOn này
-    #   - VPCStack
-    #   - SecurityGroupsStack
-    #   - RouteTablesStack
+    # Đã xóa DependsOn dư thừa
     Properties:
       TemplateURL: !Sub 'https://${NestedStacksS3Bucket}.s3.amazonaws.com/${NestedStacksS3KeyPrefix}ec2-stack.yaml'
       Parameters:
