@@ -19,6 +19,14 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: "us-east-1"
+      TF_VAR_vpc_cidr: "10.0.0.0/16"
+      TF_VAR_public_subnet_cidr: "10.0.1.0/24"
+      TF_VAR_private_subnet_cidr: "10.0.2.0/24"
+      TF_VAR_availability_zone: "us-east-1a"
+      TF_VAR_ami_id: "ami-07ff62358b87c7116" # Ami ID bạn muốn dùng
+      TF_VAR_instance_type: "t2.micro"
+      TF_VAR_key_name: "devops-key"          # Tên key bạn muốn tạo
+      TF_VAR_allowed_ip: "0.0.0.0/0"         # Hoặc IP cụ thể nếu muốn bảo mật
 
     steps:
       # 1. Checkout code từ repository
