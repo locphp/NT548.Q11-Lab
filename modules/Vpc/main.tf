@@ -1,4 +1,4 @@
-# checkov:skip=CKV2_AWS_11:VPC Flow Logs skipped for Lab cost/complexity
+# checkov:skip=CKV2_AWS_11:VPC Flow Logs skipped for Lab simplicity
 resource "aws_vpc" "main_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -12,19 +12,6 @@ resource "aws_vpc" "main_vpc" {
 
 }
 
-# --- FIX cho CKV2_AWS_12: Lock down Default SG ---
-resource "aws_default_security_group" "default" {
-  vpc_id = aws_vpc.main_vpc.id
-
-  # Không khai báo ingress/egress block nào 
-  # nghĩa là mặc định DENY ALL (Chặn tất cả) theo chuẩn bảo mật.
-
-  tags = {
-    Name = "Default Security Group - Deny All"
-  }
-}
-# -------------------------------------------------
-
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -34,7 +21,7 @@ resource "aws_internet_gateway" "internet_gateway" {
   }
 }
 
-# checkov:skip=CKV_AWS_130:Public IP needed for easy access in Lab
+# checkov:skip=CKV_AWS_130:Public IP required for Lab access
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.main_vpc.id
   cidr_block              = var.public_subnet_cidr
