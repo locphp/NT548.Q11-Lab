@@ -7,21 +7,18 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - pip install cfn-lint
-      # - pip install taskcat # Bỏ comment nếu muốn dùng taskcat (cần cấu hình thêm)
       
   pre_build:
     commands:
-      - echo "Validating CloudFormation templates with cfn-lint..."
-      # Quét file main và tất cả file trong nested-stacks
+      - echo "Validating CloudFormation templates..."
       - cfn-lint cloudformation/main-stack.yaml
       - cfn-lint cloudformation/nested-stacks/*.yaml
-      - echo "Validation completed successfully."
 
   build:
     commands:
       - echo "Packaging CloudFormation templates..."
-      # Lệnh này sẽ upload các nested stacks lên S3 và tạo ra file template mới đã thay thế đường dẫn local bằng S3 URL
-      - aws cloudformation package --template-file cloudformation/main-stack.yaml --s3-bucket $S3_BUCKET_NAME --output-template-file packaged-template.yaml
+      # [QUAN TRỌNG] Đã sửa tên biến thành $ARTIFACT_BUCKET
+      - aws cloudformation package --template-file cloudformation/main-stack.yaml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged-template.yaml
 
 artifacts:
   files:
