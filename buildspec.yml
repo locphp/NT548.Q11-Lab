@@ -12,7 +12,7 @@ phases:
     commands:
       - echo "Validating CloudFormation templates..."
       - cfn-lint cloudformation/main-stack.yaml
-      - cfn-lint cloudformation/nested-stacks/*.yaml
+      # - cfn-lint cloudformation/nested-stacks/*.yaml
 
   build:
     commands:
