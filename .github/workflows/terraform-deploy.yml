@@ -29,7 +29,7 @@ jobs:
       TF_VAR_ami_id: "ami-0c55b159cbfafe1f0" 
       TF_VAR_instance_type: "t2.micro"
       TF_VAR_key_name: "devops-key"
-      TF_VAR_allowed_ip: "0.0.0.0/0"
+      TF_VAR_allowed_ip: "14.184.93.206/32"
 
     steps:
       - name: Checkout Code

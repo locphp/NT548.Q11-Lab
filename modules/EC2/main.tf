@@ -8,6 +8,7 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.example.public_key_openssh
 }
 
+# checkov:skip=CKV2_AWS_41:IAM Role skipped for Lab simplicity
 resource "aws_instance" "public" {
   ami             = var.ami
   instance_type   = var.instance_type
@@ -44,7 +45,7 @@ resource "aws_instance" "public" {
 
 }
 
-
+# checkov:skip=CKV2_AWS_41:IAM Role skipped for Lab simplicity
 resource "aws_instance" "private" {
   ami             = var.ami
   instance_type   = var.instance_type
