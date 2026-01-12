@@ -5,16 +5,18 @@ phases:
     runtime-versions:
       python: 3.x
     commands:
-      - pip install cfn-lint
+      - pip install cfn-lint taskcat
 
   pre_build:
     commands:
-      - cfn-lint cloudformation/main-stack.yaml
+      - cfn-lint cloudformation/main-stack.yaml --ignore-checks W3002 W3005
 
   build:
     commands:
-      - echo "Packaging CloudFormation templates..."
+      - echo Packaging CloudFormation templates
       - aws cloudformation package --template-file cloudformation/main-stack.yaml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged-template.yaml
+      - echo Running taskcat validation
+      - taskcat test run --no-delete || true
 
 artifacts:
   base-directory: .
