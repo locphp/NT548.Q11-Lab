@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Main Stack - Orchestrates all nested stacks for AWS Infrastructure
-  (Best practice version for CodePipeline + cloudformation package)
+  (Compatible with cfn-lint, cloudformation package, CodePipeline)
 
 Parameters:
   VpcCIDR:
@@ -33,8 +33,8 @@ Parameters:
 
   InstanceType:
     Type: String
-    Default: 't2.micro'
-    Description: EC2 Instance Type
+    Default: t2.micro
+    Description: EC2 instance type
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -47,7 +47,7 @@ Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: cloudformation/nested-stacks/vpc-stack.yaml
+      TemplateURL: nested-stacks/vpc-stack.yaml
       Parameters:
         VpcCIDR: !Ref VpcCIDR
         PublicSubnetCIDR: !Ref PublicSubnetCIDR
@@ -64,7 +64,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: VPCStack
     Properties:
-      TemplateURL: cloudformation/nested-stacks/nat-stack.yaml
+      TemplateURL: nested-stacks/nat-stack.yaml
       Parameters:
         PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
       Tags:
@@ -78,7 +78,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: VPCStack
     Properties:
-      TemplateURL: cloudformation/nested-stacks/security-groups-stack.yaml
+      TemplateURL: nested-stacks/security-groups-stack.yaml
       Parameters:
         VPCId: !GetAtt VPCStack.Outputs.VPCId
         AllowedIP: !Ref AllowedIP
@@ -95,7 +95,7 @@ Resources:
       - VPCStack
       - NATStack
     Properties:
-      TemplateURL: cloudformation/nested-stacks/route-tables-stack.yaml
+      TemplateURL: nested-stacks/route-tables-stack.yaml
       Parameters:
         VPCId: !GetAtt VPCStack.Outputs.VPCId
         InternetGatewayId: !GetAtt VPCStack.Outputs.InternetGatewayId
@@ -104,7 +104,7 @@ Resources:
         PrivateSubnetId: !GetAtt VPCStack.Outputs.PrivateSubnetId
       Tags:
         - Key: Name
-          Value: RouteTablesStack
+          Value: RouteTables-Stack
 
   # -------------------------
   # EC2 STACK
@@ -115,7 +115,7 @@ Resources:
       - VPCStack
       - SecurityGroupsStack
     Properties:
-      TemplateURL: cloudformation/nested-stacks/ec2-stack.yaml
+      TemplateURL: nested-stacks/ec2-stack.yaml
       Parameters:
         AMIId: !Ref AMIId
         InstanceType: !Ref InstanceType
@@ -170,7 +170,7 @@ Outputs:
     Value: !GetAtt EC2Stack.Outputs.PublicInstanceId
 
   PublicInstancePublicIP:
-    Description: Public EC2 Instance Public IP
+    Description: Public EC2 Public IP
     Value: !GetAtt EC2Stack.Outputs.PublicInstancePublicIP
 
   PrivateInstanceId:
@@ -178,5 +178,5 @@ Outputs:
     Value: !GetAtt EC2Stack.Outputs.PrivateInstanceId
 
   PrivateInstancePrivateIP:
-    Description: Private EC2 Instance Private IP
+    Description: Private EC2 Private IP
     Value: !GetAtt EC2Stack.Outputs.PrivateInstancePrivateIP
