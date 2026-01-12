@@ -13,10 +13,10 @@ phases:
 
   build:
     commands:
-      - echo Packaging CloudFormation templates
+      - echo "Packaging CloudFormation templates..."
       - aws cloudformation package --template-file cloudformation/main-stack.yaml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged-template.yaml
-      - echo Running taskcat validation
-      - taskcat test run --no-delete || true
+      - echo "Running taskcat tests..."
+      - taskcat test run --no-delete || echo "Taskcat completed (non-blocking)"
 
 artifacts:
   base-directory: .
