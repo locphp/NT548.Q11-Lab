@@ -5,22 +5,22 @@ phases:
     runtime-versions:
       python: 3.x
     commands:
-      - echo "Installing dependencies..."
       - pip install cfn-lint
-      
+
   pre_build:
     commands:
-      - echo "Validating CloudFormation templates..."
       - cfn-lint cloudformation/main-stack.yaml
-      # - cfn-lint cloudformation/nested-stacks/*.yaml
 
   build:
     commands:
       - echo "Packaging CloudFormation templates..."
-      # [QUAN TRỌNG] Đã sửa tên biến thành $ARTIFACT_BUCKET
-      - aws cloudformation package --template-file cloudformation/main-stack.yaml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged-template.yaml
+      - aws cloudformation package \
+          --template-file cloudformation/main-stack.yaml \
+          --s3-bucket $ARTIFACT_BUCKET \
+          --output-template-file packaged-template.yaml
 
 artifacts:
+  base-directory: .
   files:
     - packaged-template.yaml
     - cloudformation/parameters.json
