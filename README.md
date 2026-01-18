@@ -1,4 +1,4 @@
-# Lab1_Infrastructure - NT548 DevOps Practice
+# Lab1_Infrastructure - NT548 DevOps Practice update
 
 ## Project Description
 AWS infrastructure deployment practice using Terraform, including:
