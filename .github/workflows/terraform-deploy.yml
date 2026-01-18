@@ -75,5 +75,5 @@ jobs:
         run: terraform plan -no-color -input=false -lock=false
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/lab2' && success()
+        if: github.ref == 'refs/heads/lab2'
         run: terraform apply -auto-approve -input=false
